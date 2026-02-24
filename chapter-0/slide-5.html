@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boston English Center - Lesson 3: Quick Revision</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        };
+
+        (function applyInitialTheme() {
+            let useDark = false;
+            try {
+                if (window.parent && window.parent !== window) {
+                    useDark = window.parent.document.documentElement.classList.contains('dark');
+                }
+            } catch (e) {}
+
+            if (!useDark) {
+                const saved = localStorage.getItem('theme-preference');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                useDark = saved ? saved === 'dark' : prefersDark;
+            }
+
+            document.documentElement.classList.toggle('dark', useDark);
+        })();
+
+        window.setTheme = function setTheme(theme) {
+            const useDark = theme === 'dark';
+            document.documentElement.classList.toggle('dark', useDark);
+            localStorage.setItem('theme-preference', useDark ? 'dark' : 'light');
+        };
+    </script>
+    <style>
+        .pointer-events-none.fixed.inset-0.z-0 {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .dialogue-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .dark .dialogue-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .dialogue-card:hover {
+            box-shadow: 0 20px 40px -15px #4f46e5;
+            border-color: #4f46e5;
+        }
+
+        .dialogue-card, .dialogue-card p, .dialogue-card span, .dialogue-card div {
+            color: white !important;
+        }
+
+        .speaker-a {
+            color: #818cf8 !important;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        .speaker-b {
+            color: #6ee7b7 !important;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .audio-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .audio-btn:hover {
+            background: #4338ca;
+            transform: scale(1.02);
+        }
+
+        .true-btn, .false-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            flex: 1;
+            color: white !important;
+        }
+        .true-btn {
+            background: rgba(5, 150, 105, 0.3);
+            border-color: rgba(5, 150, 105, 0.5);
+        }
+        .true-btn:hover, .true-btn.selected {
+            background: #059669;
+            border-color: #059669;
+        }
+        .false-btn {
+            background: rgba(220, 38, 38, 0.3);
+            border-color: rgba(220, 38, 38, 0.5);
+        }
+        .false-btn:hover, .false-btn.selected {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4f46e5;
+            width: 0%;
+            transition: width 0.3s linear; 
+        }
+
+        .lesson-tag {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(79, 70, 229, 0.2);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 1rem;
+        }
+
+        .bg-indigo-600 {
+            background-color: #4f46e5 !important;
+        }
+
+        .score-badge {
+            background: #4f46e5;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+    
+        .dialogue-badge {
+            background: rgba(79, 70, 229, 0.3);
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+     
+        .question-text {
+            color: white !important;
+            font-weight: 700;
+        }
+
+        .progress-text {
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="h-full overflow-y-auto bg-slate-50 dark:bg-slate-900">
+
+    <div class="pointer-events-none fixed inset-0 z-0">
+        <div class="absolute -top-28 -left-28 h-80 w-80 rounded-full bg-indigo-500/15 blur-3xl dark:bg-indigo-500/25"></div>
+        <div class="absolute -bottom-36 -right-28 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-500/20"></div>
+        <div class="absolute left-1/2 top-[85%] -translate-x-1/2 h-[28rem] w-[28rem] rounded-full bg-emerald-500/10 blur-3xl dark:bg-emerald-500/15"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 py-8 pb-20">
+     
+        <div class="mb-8">
+            <span class="lesson-tag">Lesson 3 · A1 Beginner</span>
+            <h1 class="text-3xl md:text-4xl font-black text-white mt-1">First, let's do a quick revision!</h1>
+        </div>
+
+     
+<div class="flex flex-wrap items-center gap-4 mb-8">
+    <button onclick="playAllDialogues()" class="audio-btn">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span id="playBtnText">Play All Dialogues</span>
+    </button>
+    
+    <div class="flex items-center gap-3">
+        <span class="text-sm progress-text">Progress</span>
+        <div class="progress-bar">
+            <div id="audioProgress" class="progress-fill"></div>
+        </div>
+    </div>
+   
+    <div class="flex items-center gap-3">
+        <span class="text-sm progress-text">Voice:</span>
+        <select id="voiceSelect" class="bg-white/10 text-white border border-white/20 rounded-full px-3 py-1 text-sm min-w-[180px]">
+            <option value="">Default Voice</option>
+        </select>
+    </div>
+    
+    <div class="score-badge bg-indigo-600 text-white px-4 py-2 rounded-full font-bold text-sm">
+        Score: <span id="scoreDisplay">0/4</span>
+    </div>
+</div>
+
+   
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+            <div class="dialogue-card" id="dialogue1">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(79, 70, 229, 0.3); border: 1px solid rgba(255, 255, 255, 0.3); color: white !important;">
+                        DIALOGUE 1 · Kitchen
+                    </span>
+                    <button onclick="speakDialogue(1)" class="text-white hover:text-indigo-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-3 mb-4 text-sm">
+                    <p><span class="speaker-a">A:</span> Does the kitchen have everything you need, like a stove and a refrigerator?</p>
+                    <p><span class="speaker-b">B:</span> There's a stove, but not a refrigerator. I need to buy one.</p>
+                </div>
+                
+                <p class="question-text font-bold mb-3">The kitchen has a refrigerator.</p>
+                
+                <div class="flex gap-3">
+                    <button class="true-btn" onclick="selectAnswer(1, 'true')" id="q1-true">True</button>
+                    <button class="false-btn" onclick="selectAnswer(1, 'false')" id="q1-false">False</button>
+                </div>
+            </div>
+
+            <div class="dialogue-card" id="dialogue2">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(79, 70, 229, 0.3); border: 1px solid rgba(255, 255, 255, 0.3); color: white !important;">
+                        DIALOGUE 2 · Bedroom
+                    </span>
+                    <button onclick="speakDialogue(2)" class="text-white hover:text-indigo-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-3 mb-4 text-sm">
+                    <p><span class="speaker-a">A:</span> You don't have a bed in your bedroom?</p>
+                    <p><span class="speaker-b">B:</span> Well, I have a TV. But for now, I only have a mattress on the floor.</p>
+                    <p><span class="speaker-a">A:</span> Really?</p>
+                </div>
+                
+                <p class="question-text font-bold mb-3">B has a bed in the bedroom.</p>
+                
+                <div class="flex gap-3">
+                    <button class="true-btn" onclick="selectAnswer(2, 'true')" id="q2-true">True</button>
+                    <button class="false-btn" onclick="selectAnswer(2, 'false')" id="q2-false">False</button>
+                </div>
+            </div>
+
+
+            <div class="dialogue-card" id="dialogue3">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(79, 70, 229, 0.3); border: 1px solid rgba(255, 255, 255, 0.3); color: white !important;">
+                        DIALOGUE 3 · Living Room
+                    </span>
+                    <button onclick="speakDialogue(3)" class="text-white hover:text-indigo-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-3 mb-4 text-sm">
+                    <p><span class="speaker-a">A:</span> We don't have much furniture yet. We don't even have a sofa in the living room.</p>
+                    <p><span class="speaker-b">B:</span> Hey. I've one I can sell you.</p>
+                    <p><span class="speaker-a">A:</span> Really? Great.</p>
+                </div>
+                
+                <p class="question-text font-bold mb-3">B offers to sell A a sofa.</p>
+                
+                <div class="flex gap-3">
+                    <button class="true-btn" onclick="selectAnswer(3, 'true')" id="q3-true">True</button>
+                    <button class="false-btn" onclick="selectAnswer(3, 'false')" id="q3-false">False</button>
+                </div>
+            </div>
+        
+            <div class="dialogue-card" id="dialogue4">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold" style="background: rgba(79, 70, 229, 0.3); border: 1px solid rgba(255, 255, 255, 0.3); color: white !important;">
+                        DIALOGUE 4 · Bathroom
+                    </span>
+                    <button onclick="speakDialogue(4)" class="text-white hover:text-indigo-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-3 mb-4 text-sm">
+                    <p><span class="speaker-a">A:</span> The bathroom is very small. There's just a shower and a toilet.</p>
+                    <p><span class="speaker-b">B:</span> You can come and take a bath at my place any time.</p>
+                    <p><span class="speaker-a">A:</span> Thanks, I probably will.</p>
+                </div>
+                
+                <p class="question-text font-bold mb-3">The bathroom has a bathtub.</p>
+                
+                <div class="flex gap-3">
+                    <button class="true-btn" onclick="selectAnswer(4, 'true')" id="q4-true">True</button>
+                    <button class="false-btn" onclick="selectAnswer(4, 'false')" id="q4-false">False</button>
+                </div>
+            </div>
+        </div> 
+        </div>
+
+
+    </div>
+
+    <script>
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+     
+        const voiceSelect = document.getElementById('voiceSelect');
+        const selectedIndex = voiceSelect.value;
+        
+        if (selectedIndex !== '') {
+        
+            utterance.voice = availableVoices[selectedIndex];
+        }
+        
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+        const dialogues = {
+            1: ["Does the kitchen have everything you need, like a stove and a refrigerator?", "There's a stove, but not a refrigerator. I need to buy one."],
+            2: ["You don't have a bed in your bedroom?", "Well, I have a TV. But for now, I only have a mattress on the floor.", "Really?"],
+            3: ["We don't have much furniture yet. We don't even have a sofa in the living room.", "Hey. I've one I can sell you.", "Really? Great."],
+            4: ["The bathroom is very small. There's just a shower and a toilet.", "You can come and take a bath at my place any time.", "Thanks, I probably will."]
+        };
+
+        function speakDialogue(num) {
+            speakText(dialogues[num].join(' '));
+            
+       
+            document.querySelectorAll('.dialogue-card').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.2)');
+            document.getElementById(`dialogue${num}`).style.borderColor = '#4f46e5';
+        }
+
+    
+        let isPlaying = false;
+        let audioInterval;
+        let currentProgress = 0;
+
+        function playAllDialogues() {
+            if (isPlaying) {
+                clearInterval(audioInterval);
+                isPlaying = false;
+                document.getElementById('playBtnText').textContent = 'Play All Dialogues';
+                window.speechSynthesis.cancel();
+                return;
+            }
+
+            isPlaying = true;
+            document.getElementById('playBtnText').textContent = 'Stop';
+            
+            let dialogueIndex = 1;
+            speakDialogue(dialogueIndex);
+            currentProgress = 25;
+          
+            gsap.to('#audioProgress', {
+                width: '25%',
+                duration: 5,
+                ease: "linear",
+                onComplete: function() {
+              
+                }
+            });
+            
+            audioInterval = setInterval(() => {
+                dialogueIndex++;
+                if (dialogueIndex <= 4) {
+                    speakDialogue(dialogueIndex);
+         
+                    gsap.to('#audioProgress', {
+                        width: (dialogueIndex * 25) + '%',
+                        duration: 5,
+                        ease: "linear"
+                    });
+                } else {
+                    clearInterval(audioInterval);
+                    isPlaying = false;
+                    document.getElementById('playBtnText').textContent = 'Play All Dialogues';
+             
+                    gsap.to('#audioProgress', {
+                        width: '0%',
+                        duration: 1,
+                        ease: "power2.out",
+                        onComplete: function() {
+                            currentProgress = 0;
+                        }
+                    });
+                }
+            }, 5000); 
+        }
+
+        // Answer tracking
+        let answers = {1: null, 2: null, 3: null, 4: null};
+        const correctAnswers = {1: 'false', 2: 'false', 3: 'true', 4: 'false'};
+
+        function selectAnswer(question, value) {
+
+            document.getElementById(`q${question}-true`).classList.remove('selected');
+            document.getElementById(`q${question}-false`).classList.remove('selected');
+         
+            document.getElementById(`q${question}-${value}`).classList.add('selected');
+            
+       
+            answers[question] = value;
+            
+    
+            let score = 0;
+            for (let q = 1; q <= 4; q++) {
+                if (answers[q] === correctAnswers[q]) score++;
+            }
+            document.getElementById('scoreDisplay').textContent = `${score}/4`;
+       
+            if (value === correctAnswers[question]) {
+
+                new Audio('https://remtoo.net/slider/success.wav').play().catch(() => {});
+            }
+        }
+
+        window.stopSlideAudio = function() {
+            clearInterval(audioInterval);
+            window.speechSynthesis?.cancel();
+            gsap.killTweensOf('#audioProgress');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bank Vocabulary Drag & Drop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: linear-gradient(135deg, #0f172a, #1e1b4b);
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        color: #818cf8;
+        background: linear-gradient(135deg, #818cf8, #c084fc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .story-container {
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .story {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        border-radius: 1rem;
+        padding: 2rem;
+        line-height: 1.7;
+        font-size: 1.05rem;
+      }
+
+      .blank {
+        display: inline-block;
+        width: 8rem;
+        min-height: 1.5rem;
+        border-bottom: 2px dashed rgba(255, 255, 255, 0.5);
+        margin: 0 0.3rem;
+        vertical-align: middle;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .blank.correct {
+        color: #22c55e;
+        border-bottom: 2px solid #16a34a;
+      }
+
+      .blank.wrong {
+        color: #ef4444;
+        border-bottom: 2px solid #b91c1c;
+      }
+
+      .word-bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      .word {
+        background: rgba(79, 70, 229, 0.3);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        cursor: grab;
+        font-weight: 600;
+        user-select: none;
+        transition: all 0.2s;
+      }
+
+      .word:active {
+        cursor: grabbing;
+        transform: scale(1.05);
+      }
+
+      button {
+        background: #4f46e5;
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        align-self: center;
+      }
+
+      button:hover {
+        background: #4338ca;
+        transform: scale(1.05);
+      }
+
+      #completionCard {
+        display: none;
+        margin-top: 2rem;
+        text-align: center;
+        background: rgba(79, 70, 229, 0.3);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid #4f46e5;
+      }
+
+      #confetti {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="confetti"></div>
+
+    <div class="story-container">
+      <h1>🏦 Drag & Drop Fill-in</h1>
+
+      <p class="story">
+        The customer went to the bank to open a new
+        <span class="blank" data-answer="account"></span>. The worker asked for
+        his <span class="blank" data-answer="ID card"></span> to check who he
+        was. He filled out a <span class="blank" data-answer="form"></span> and
+        gave a <span class="blank" data-answer="signature"></span>. Then the
+        worker asked how much he wanted to
+        <span class="blank" data-answer="deposit"></span>. He gave $500 in
+        <span class="blank" data-answer="cash"></span>. The worker put
+        everything into the
+        <span class="blank" data-answer="computer system"></span>. He said the
+        account would be <span class="blank" data-answer="active"></span> soon.
+        He also said the customer would get an
+        <span class="blank" data-answer="email"></span> soon.
+      </p>
+
+      <div class="word-bank" id="wordBank"></div>
+
+      <button onclick="checkAnswers()">Submit</button>
+
+      <div id="completionCard">
+        <h2>🎉 Well done!</h2>
+        <p>You completed the exercise.</p>
+        <p>Your Score: <span id="scoreText"></span> / 9 ✅</p>
+      </div>
+    </div>
+
+    <script>
+      const words = [
+        "account",
+        "ID card",
+        "form",
+        "signature",
+        "deposit",
+        "cash",
+        "computer system",
+        "active",
+        "email",
+      ];
+
+      function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+      }
+
+      const bank = document.getElementById("wordBank");
+      shuffle(words).forEach((word) => {
+        const span = document.createElement("span");
+        span.classList.add("word");
+        span.textContent = word;
+        span.setAttribute("draggable", "true");
+        bank.appendChild(span);
+      });
+
+      let dragged = null;
+      document.addEventListener("dragstart", (e) => {
+        if (e.target.classList.contains("word")) dragged = e.target;
+      });
+
+      document.querySelectorAll(".blank").forEach((blank) => {
+        blank.addEventListener("dragover", (e) => e.preventDefault());
+        blank.addEventListener("drop", (e) => {
+          if (dragged) {
+            blank.textContent = dragged.textContent;
+            dragged.style.display = "none";
+          }
+        });
+      });
+
+      function checkAnswers() {
+        const blanks = document.querySelectorAll(".blank");
+        let score = 0;
+        blanks.forEach((blank) => {
+          if (
+            blank.textContent.trim().toLowerCase() ===
+            blank.dataset.answer.toLowerCase()
+          ) {
+            blank.classList.add("correct");
+            score++;
+          } else {
+            blank.classList.add("wrong");
+            blank.textContent += ` (✗ ${blank.dataset.answer})`;
+          }
+          blank.style.pointerEvents = "none";
+        });
+
+        document.getElementById("scoreText").textContent = score;
+        const completion = document.getElementById("completionCard");
+        completion.style.display = "block";
+        gsap.fromTo(
+          completion,
+          { scale: 0.8, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.6, ease: "elastic.out(1,0.5)" }
+        );
+        launchConfetti();
+      }
+
+      function launchConfetti() {
+        const container = document.getElementById("confetti");
+        for (let i = 0; i < 150; i++) {
+          const conf = document.createElement("div");
+          conf.style.position = "absolute";
+          conf.style.width = "6px";
+          conf.style.height = "6px";
+          conf.style.background = ["#f43f5e", "#fbbf24", "#22c55e", "#3b82f6"][
+            Math.floor(Math.random() * 4)
+          ];
+          conf.style.top = "0px";
+          conf.style.left = Math.random() * window.innerWidth + "px";
+          conf.style.opacity = Math.random();
+          conf.style.borderRadius = "50%";
+          container.appendChild(conf);
+          gsap.to(conf, {
+            y: window.innerHeight + 50,
+            rotation: 360,
+            duration: Math.random() * 3 + 2,
+            ease: "power2.out",
+            onComplete: () => {
+              conf.remove();
+            },
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

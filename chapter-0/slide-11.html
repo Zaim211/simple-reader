@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boston English Center - Lesson 3: Setting up a Bank Account</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+            },
+          },
+        },
+      };
+
+      (function applyInitialTheme() {
+        let useDark = false;
+        try {
+          if (window.parent && window.parent !== window) {
+            useDark =
+              window.parent.document.documentElement.classList.contains("dark");
+          }
+        } catch (e) {}
+
+        if (!useDark) {
+          const saved = localStorage.getItem("theme-preference");
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          useDark = saved ? saved === "dark" : prefersDark;
+        }
+
+        document.documentElement.classList.toggle("dark", useDark);
+      })();
+
+      window.setTheme = function setTheme(theme) {
+        const useDark = theme === "dark";
+        document.documentElement.classList.toggle("dark", useDark);
+        localStorage.setItem("theme-preference", useDark ? "dark" : "light");
+      };
+    </script>
+    <style>
+      .pointer-events-none.fixed.inset-0.z-0 {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .bg-blur-circle-1 {
+        position: absolute;
+        top: -10rem;
+        left: -10rem;
+        width: 30rem;
+        height: 30rem;
+        border-radius: 50%;
+        background: rgba(79, 70, 229, 0.2);
+        filter: blur(80px);
+      }
+
+      .bg-blur-circle-2 {
+        position: absolute;
+        bottom: -10rem;
+        right: -10rem;
+        width: 35rem;
+        height: 35rem;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.15);
+        filter: blur(80px);
+      }
+
+      .horizontal-container {
+        display: flex;
+        gap: 1.5rem;
+        height: calc(100vh - 120px);
+        min-height: 600px;
+      }
+
+      .script-panel {
+        flex: 2;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 2rem;
+        padding: 1.5rem;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.5);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .discussion-panel {
+        flex: 1;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 2rem;
+        padding: 1.5rem;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.5);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .bank-scene {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border-radius: 1.5rem;
+        padding: 1.25rem;
+        border: 1px solid #4f46e5;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .bank-scene::before {
+        content: "🏦";
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        font-size: 4rem;
+        opacity: 0.1;
+      }
+
+      .scene-title {
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .scene-title span {
+        color: #4f46e5;
+        font-size: 0.8rem;
+        background: rgba(79, 70, 229, 0.2);
+        padding: 0.2rem 0.75rem;
+        border-radius: 2rem;
+      }
+
+      .scene-desc {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+      }
+
+      .script-scroll {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .script-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .script-scroll::-webkit-scrollbar-track {
+        background: #1e293b;
+        border-radius: 10px;
+      }
+
+      .script-scroll::-webkit-scrollbar-thumb {
+        background: #4f46e5;
+        border-radius: 10px;
+      }
+
+      .script-line {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        background: rgba(30, 41, 59, 0.5);
+      }
+
+      .script-line:hover {
+        background: rgba(79, 70, 229, 0.2);
+        border-color: #4f46e5;
+        transform: translateX(5px);
+      }
+
+      .speaker-employee {
+        color: #818cf8;
+        font-weight: 700;
+        font-size: 0.8rem;
+        min-width: 95px;
+        background: rgba(129, 140, 248, 0.1);
+        padding: 0.2rem 0.5rem;
+        border-radius: 2rem;
+        text-align: center;
+        border: 1px solid rgba(129, 140, 248, 0.3);
+      }
+
+      .speaker-customer {
+        color: #6ee7b7;
+        font-weight: 700;
+        font-size: 0.8rem;
+        min-width: 95px;
+        background: rgba(110, 231, 183, 0.1);
+        padding: 0.2rem 0.5rem;
+        border-radius: 2rem;
+        text-align: center;
+        border: 1px solid rgba(110, 231, 183, 0.3);
+      }
+
+      .script-text {
+        color: white;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        flex: 1;
+      }
+
+      .discussion-box {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 2px solid #4f46e5;
+        margin-bottom: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .discussion-title {
+        color: #818cf8;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .discussion-question {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.5;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 1rem;
+        border-left: 4px solid #4f46e5;
+      }
+
+      .listen-btn {
+        background: #4f46e5;
+        color: white;
+        padding: 1rem;
+        border-radius: 3rem;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #a5b4fc;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        width: 100%;
+        margin-bottom: 1rem;
+        flex-shrink: 0;
+      }
+
+      .listen-btn:hover {
+        background: #4338ca;
+        transform: scale(1.02);
+        border-color: white;
+      }
+
+      .listen-btn.speaking {
+        background: #059669;
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      .key-vocab {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 1rem;
+        padding: 1rem;
+        border: 1px solid #334155;
+        flex-shrink: 0;
+      }
+
+      .vocab-title {
+        color: #94a3b8;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .vocab-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .vocab-tag {
+        background: #1e293b;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        border: 1px solid #4f46e5;
+      }
+
+      .lesson-tag {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: #4f46e5;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 0.5rem;
+      }
+
+      .teacher-cue-btn {
+        background: #4f46e5;
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .teacher-cue-btn:hover {
+        background: #4338ca;
+      }
+
+      .cue-tooltip {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        transform: translateY(10px);
+        width: 280px;
+        background: #1e293b;
+        border-radius: 1rem;
+        padding: 1rem;
+        border: 2px solid #4f46e5;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 50;
+        color: white;
+      }
+
+      .group:hover .cue-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(20px);
+      }
+
+      h1 {
+        text-shadow: 0 2px 10px rgba(79, 70, 229, 0.5);
+        font-size: 1.8rem;
+        line-height: 1.2;
+      }
+
+      h1 span {
+        font-size: 2.2rem;
+      }
+
+      @media (max-width: 768px) {
+        .horizontal-container {
+          flex-direction: column;
+          height: auto;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="h-full overflow-hidden"
+    style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)"
+  >
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="bg-blur-circle-1"></div>
+      <div class="bg-blur-circle-2"></div>
+    </div>
+
+    <div class="relative z-10 h-full flex flex-col max-w-7xl mx-auto px-4 py-4">
+      <div
+        class="flex flex-wrap items-center justify-between gap-2 mb-3 flex-shrink-0"
+      >
+        <div class="flex items-center gap-3">
+          <span class="lesson-tag">LESSON 3 · BANKING</span>
+          <h1 class="text-white font-light">
+            Setting up a<span class="font-black text-indigo-400 block"
+              >Bank Account</span
+            >
+          </h1>
+        </div>
+
+        <div class="group relative">
+          <button class="teacher-cue-btn">
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Teacher Cue
+          </button>
+          <div class="cue-tooltip text-left">
+            <p class="text-indigo-400 font-bold mb-2">🎯 BEFORE LISTENING</p>
+            <p class="text-sm">
+              Prepare students for a bank conversation about opening an account.
+            </p>
+            <p class="text-sm font-medium text-indigo-300 mt-2">Discussion:</p>
+            <p class="text-sm">
+              "Have you ever opened a bank account? Share your experience."
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="horizontal-container flex-1 min-h-0">
+        <div class="script-panel">
+          <div class="bank-scene">
+            <div class="scene-title">
+              At the Bank <span>🏦 NEW ACCOUNT</span>
+            </div>
+            <div class="scene-desc">
+              Conversation between a bank employee and a customer opening a
+              savings account
+            </div>
+          </div>
+
+          <div class="script-scroll">
+            <div class="space-y-1">
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text">Good morning.</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text">Good morning, sir.</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text">How can I help you today?</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text"
+                  >I'd like to open a new savings account.</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >Sure. Do you have your ID card with you?</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text">Yes, here it is.</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >Thank you. Please fill out this form.</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text"
+                  >Okay. Do I need to give a photo too?</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >Yes. One passport-size photo is required.</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text">All right. I have one with me.</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >Perfect. How much would you like to deposit today?</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text">I'd like to deposit $500.</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >No problem. Please hand me the cash.</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text">Here you go.</span>
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >Thank you. I'll enter the details into the system.</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text"
+                  >How long will it take to get my account active?</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-employee">Bank Employee:</span
+                ><span class="script-text"
+                  >Just a few minutes. You'll also receive an ATM card
+                  soon.</span
+                >
+              </div>
+              <div class="script-line">
+                <span class="speaker-customer">Customer:</span
+                ><span class="script-text"
+                  >Great. Thank you for your help.</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="discussion-panel">
+          <div class="discussion-box">
+            <div class="discussion-title">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Before You Listen
+            </div>
+            <div class="discussion-question">
+              "Have you ever opened a bank account before? Tell us about your
+              experience."
+            </div>
+          </div>
+
+          <button id="readBtn" class="listen-btn" onclick="toggleReadScript()">
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+              />
+            </svg>
+            <span id="btnText">Listen to Conversation</span>
+          </button>
+
+          <div class="key-vocab">
+            <div class="vocab-title">📘 Key Vocabulary</div>
+            <div class="vocab-tags">
+              <span class="vocab-tag">savings account</span>
+              <span class="vocab-tag">ID card</span>
+              <span class="vocab-tag">deposit</span>
+              <span class="vocab-tag">passport-size photo</span>
+              <span class="vocab-tag">ATM card</span>
+              <span class="vocab-tag">fill out a form</span>
+            </div>
+          </div>
+
+          <div class="mt-auto text-center text-white/30 text-xs pt-4">
+            🎬 Click "Listen" to hear the conversation
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let isSpeaking = false;
+
+      const fullScript = `
+            Bank Employee: Good morning.
+            Customer: Good morning, sir.
+            Bank Employee: How can I help you today?
+            Customer: I'd like to open a new savings account.
+            Bank Employee: Sure. Do you have your ID card with you?
+            Customer: Yes, here it is.
+            Bank Employee: Thank you. Please fill out this form.
+            Customer: Okay. Do I need to give a photo too?
+            Bank Employee: Yes. One passport-size photo is required.
+            Customer: All right. I have one with me.
+            Bank Employee: Perfect. How much would you like to deposit today?
+            Customer: I'd like to deposit $500.
+            Bank Employee: No problem. Please hand me the cash.
+            Customer: Here you go.
+            Bank Employee: Thank you. I'll enter the details into the system.
+            Customer: How long will it take to get my account active?
+            Bank Employee: Just a few minutes. You'll also receive an ATM card soon.
+            Customer: Great. Thank you for your help.
+        `;
+
+      function toggleReadScript() {
+        const btn = document.getElementById("readBtn");
+        const btnText = document.getElementById("btnText");
+
+        if (isSpeaking) {
+          window.speechSynthesis.cancel();
+          isSpeaking = false;
+          btn.classList.remove("speaking");
+          btnText.textContent = "Listen to Conversation";
+        } else {
+          const utterance = new SpeechSynthesisUtterance(fullScript);
+          utterance.rate = 0.9;
+          utterance.onend = function () {
+            isSpeaking = false;
+            btn.classList.remove("speaking");
+            btnText.textContent = "Listen to Conversation";
+          };
+
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(utterance);
+
+          isSpeaking = true;
+          btn.classList.add("speaking");
+          btnText.textContent = "Stop";
+        }
+      }
+
+      window.resetSlide = function () {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        const btn = document.getElementById("readBtn");
+        const btnText = document.getElementById("btnText");
+        if (btn) {
+          btn.classList.remove("speaking");
+          btnText.textContent = "Listen to Conversation";
+        }
+      };
+
+      window.stopSlideAudio = function () {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+      };
+    </script>
+  </body>
+</html>

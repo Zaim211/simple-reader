@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Baloo 2", cursive;
+      }
+
+      .question-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 1.8rem;
+        border: 3px dashed white;
+        transition: 0.3s;
+      }
+
+      .question-card:hover {
+        transform: scale(1.03);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .teacher-btn {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        background: linear-gradient(45deg, #f472b6, #60a5fa);
+        padding: 1rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        transition: 0.3s;
+      }
+
+      .teacher-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .teacher-box {
+        position: fixed;
+        bottom: 110px;
+        right: 40px;
+        background: white;
+        color: #111;
+        padding: 1.5rem;
+        border-radius: 20px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        font-weight: 600;
+        display: none;
+        max-width: 280px;
+      }
+
+      .teacher-box:after {
+        content: "";
+        position: absolute;
+        bottom: -18px;
+        right: 30px;
+        border-width: 18px 14px 0 14px;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+      }
+    </style>
+  </head>
+
+  <body class="bg-slate-900 text-white min-h-screen overflow-y-auto">
+    <div
+      class="absolute top-0 left-0 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl"
+    ></div>
+    <div
+      class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl"
+    ></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-10 py-20">
+      <div class="text-center mb-16">
+        <h1 class="text-6xl font-extrabold mb-4">💬 Let’s Talk About Bills!</h1>
+        <p class="text-xl text-white/70">
+          Discuss with your partner or teacher
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="space-y-8">
+          <div class="question-card">
+            <h2 class="text-2xl font-bold">
+              1️⃣ What kind of bills can you see?
+            </h2>
+          </div>
+
+          <div class="question-card">
+            <h2 class="text-2xl font-bold">
+              2️⃣ How often do you pay your bills?
+            </h2>
+          </div>
+
+          <div class="question-card">
+            <h2 class="text-2xl font-bold">
+              3️⃣ Do you need to go to the bank to pay your bills?
+            </h2>
+          </div>
+        </div>
+
+        <div>
+          <img
+            src="https://images.unsplash.com/photo-1554224155-6726b3ff858f"
+            alt="Utility bills and calculator"
+            class="rounded-3xl shadow-2xl border-4 border-white/20"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="teacher-btn"
+      onclick="toggleTeacher()"
+      style="
+        left: 40px;
+        right: auto;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+      "
+    >
+      👩‍🏫 Teacher Cue
+    </div>
+
+    <div
+      id="teacherBox"
+      style="
+        position: fixed;
+        bottom: 110px;
+        left: 40px;
+        width: 300px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(12px);
+        border-radius: 25px;
+        padding: 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+        color: white;
+        font-weight: 600;
+      "
+    >
+      <div style="color: #60a5fa; font-weight: 800; margin-bottom: 10px">
+        🎯 Teacher Instructions
+      </div>
+
+      <div
+        style="
+          line-height: 1.6;
+          font-size: 1rem;
+          color: rgba(255, 255, 255, 0.9);
+        "
+      >
+        Elicit answers from the students.<br /><br />
+        Encourage full sentences.
+      </div>
+    </div>
+
+    <script>
+      function toggleTeacher() {
+        const box = document.getElementById("teacherBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      }
+    </script>
+  </body>
+</html>

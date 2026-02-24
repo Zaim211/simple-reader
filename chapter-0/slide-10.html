@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boston English Center - Lesson 3: Reading Comprehension</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+            },
+          },
+        },
+      };
+
+      (function applyInitialTheme() {
+        let useDark = false;
+        try {
+          if (window.parent && window.parent !== window) {
+            useDark =
+              window.parent.document.documentElement.classList.contains("dark");
+          }
+        } catch (e) {}
+
+        if (!useDark) {
+          const saved = localStorage.getItem("theme-preference");
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          useDark = saved ? saved === "dark" : prefersDark;
+        }
+
+        document.documentElement.classList.toggle("dark", useDark);
+      })();
+
+      window.setTheme = function setTheme(theme) {
+        const useDark = theme === "dark";
+        document.documentElement.classList.toggle("dark", useDark);
+        localStorage.setItem("theme-preference", useDark ? "dark" : "light");
+      };
+    </script>
+    <style>
+      .pointer-events-none.fixed.inset-0.z-0 {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .bg-blur-circle-1 {
+        position: absolute;
+        top: -10rem;
+        left: -10rem;
+        width: 30rem;
+        height: 30rem;
+        border-radius: 50%;
+        background: rgba(79, 70, 229, 0.2);
+        filter: blur(80px);
+      }
+
+      .bg-blur-circle-2 {
+        position: absolute;
+        bottom: -10rem;
+        right: -10rem;
+        width: 35rem;
+        height: 35rem;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.15);
+        filter: blur(80px);
+      }
+
+      .reading-container {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 2rem;
+        padding: 2rem;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.5);
+      }
+
+      .bill-card {
+        background: #1e293b;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        border: 1px solid #334155;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .bill-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: linear-gradient(90deg, #4f46e5, #818cf8, #4f46e5);
+      }
+
+      .bill-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px dashed #334155;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .company-name {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: white;
+        letter-spacing: -0.02em;
+      }
+
+      .company-name span {
+        color: #4f46e5;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
+
+      .bill-date {
+        color: #94a3b8;
+        font-size: 0.9rem;
+      }
+
+      .bill-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #334155;
+        color: white;
+      }
+
+      .bill-row:last-child {
+        border-bottom: none;
+      }
+
+      .bill-label {
+        color: #94a3b8;
+        font-weight: 500;
+      }
+
+      .bill-value {
+        font-weight: 700;
+      }
+
+      .total-row {
+        background: #0f172a;
+        padding: 1rem;
+        border-radius: 1rem;
+        margin-top: 1rem;
+        border: 1px solid #4f46e5;
+      }
+
+      .total-row .bill-label {
+        color: #818cf8;
+        font-size: 1.1rem;
+      }
+
+      .total-row .bill-value {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 800;
+      }
+
+      .due-date {
+        background: rgba(79, 70, 229, 0.2);
+        color: #818cf8;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        display: inline-block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid #4f46e5;
+        margin-top: 1rem;
+      }
+
+      .question-card {
+        background: #1e293b;
+        border-radius: 1.25rem;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid #334155;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .question-number {
+        background: #4f46e5;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #a5b4fc;
+        box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+      }
+
+      .question-text {
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
+
+      .option-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.4rem;
+        border-radius: 0.75rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        font-size: 0.95rem;
+      }
+
+      .option-item:hover {
+        background: #2d3748;
+        border-color: #4f46e5;
+        transform: translateX(5px);
+      }
+
+      .option-item.selected {
+        background: #4f46e5;
+        border-color: white;
+        border-width: 2px;
+      }
+
+      .option-letter {
+        background: #1e293b;
+        color: white;
+        width: 1.8rem;
+        height: 1.8rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        border: 1px solid #4f46e5;
+      }
+
+      .selected .option-letter {
+        background: white;
+        color: #4f46e5;
+      }
+
+      .lesson-tag {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: #4f46e5;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+      }
+
+      .teacher-cue-btn {
+        background: #4f46e5;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+      }
+
+      .teacher-cue-btn:hover {
+        background: #4338ca;
+        transform: scale(1.02);
+      }
+
+      .cue-tooltip {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        width: 280px;
+        background: #1e293b;
+        border-radius: 1rem;
+        padding: 1rem 1.5rem;
+        border: 2px solid #4f46e5;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 50;
+        color: white;
+      }
+
+      .group:hover .cue-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(20px);
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .two-column {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .submit-btn {
+        background: #4f46e5;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #a5b4fc;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      .submit-btn:hover {
+        background: #4338ca;
+        transform: scale(1.02);
+        border-color: white;
+      }
+    </style>
+  </head>
+  <body
+    class="h-full overflow-y-auto"
+    style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)"
+  >
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="bg-blur-circle-1"></div>
+      <div class="bg-blur-circle-2"></div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 py-6 pb-16 min-h-screen">
+      <div class="w-full">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="lesson-tag">LESSON 3 · READING</span>
+            <h1 class="text-3xl md:text-4xl font-light text-white mt-1">
+              Reading<span
+                class="font-black text-indigo-400 block text-4xl md:text-5xl"
+                >Comprehension</span
+              >
+            </h1>
+          </div>
+
+          <div class="group relative">
+            <button class="teacher-cue-btn">
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Teacher Cue
+            </button>
+            <div class="cue-tooltip text-left">
+              <p class="text-indigo-400 font-bold mb-2">
+                📖 READING INSTRUCTION
+              </p>
+              <p class="text-sm">
+                Students read the cable TV bill and answer questions
+              </p>
+              <p class="text-xs text-white/80 mt-2">
+                Discuss vocabulary: due date, charges, total, etc.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <div class="reading-container">
+            <h2
+              class="text-xl font-bold text-white mb-4 flex items-center gap-2"
+            >
+              <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+              MY CABLE TV BILL
+            </h2>
+
+            <div class="bill-card">
+              <div class="bill-header">
+                <div>
+                  <div class="company-name">
+                    STREAMVISION CABLE <span>TV</span>
+                  </div>
+                  <div class="text-indigo-400 text-sm mt-1">
+                    Your Entertainment Partner
+                  </div>
+                </div>
+                <div class="bill-date">📅 March 2024</div>
+              </div>
+
+              <div class="bill-row">
+                <span class="bill-label">Account Number:</span>
+                <span class="bill-value">TV-874-5921-03</span>
+              </div>
+              <div class="bill-row">
+                <span class="bill-label">Customer:</span>
+                <span class="bill-value">James Anderson</span>
+              </div>
+              <div class="bill-row">
+                <span class="bill-label">Service Address:</span>
+                <span class="bill-value">124 Main Street, Apt 4B</span>
+              </div>
+
+              <div class="mt-4 pt-2 border-t border-dashed border-slate-600">
+                <div class="bill-row">
+                  <span class="bill-label">Basic Cable Package:</span>
+                  <span class="bill-value">$45.00</span>
+                </div>
+                <div class="bill-row">
+                  <span class="bill-label">HD Technology Fee:</span>
+                  <span class="bill-value">$10.00</span>
+                </div>
+                <div class="bill-row">
+                  <span class="bill-label">DVR Service:</span>
+                  <span class="bill-value">$15.00</span>
+                </div>
+                <div class="bill-row">
+                  <span class="bill-label"
+                    >Premium Channels (HBO, Showtime):</span
+                  >
+                  <span class="bill-value">$25.00</span>
+                </div>
+                <div class="bill-row">
+                  <span class="bill-label">Broadcast TV Fee:</span>
+                  <span class="bill-value">$8.50</span>
+                </div>
+                <div class="bill-row">
+                  <span class="bill-label">Regional Sports Fee:</span>
+                  <span class="bill-value">$7.50</span>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-2 border-t border-dashed border-slate-600">
+                <div class="bill-row">
+                  <span class="bill-label">Sales Tax (6%):</span>
+                  <span class="bill-value">$6.66</span>
+                </div>
+                <div class="bill-row">
+                  <span class="bill-label">FCC Fee:</span>
+                  <span class="bill-value">$1.25</span>
+                </div>
+              </div>
+
+              <div class="total-row">
+                <div class="bill-row">
+                  <span class="bill-label">TOTAL CURRENT CHARGES:</span>
+                  <span class="bill-value">$118.91</span>
+                </div>
+              </div>
+
+              <div class="text-center mt-4">
+                <div class="due-date">⏰ DUE DATE: February 24, 2026</div>
+                <p class="text-indigo-300/50 text-xs mt-3">
+                  Please pay by the due date to avoid late fees
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="reading-container">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+                Questions
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              <div class="question-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">1</div>
+                  <span class="question-text"
+                    >What is the customer's name?</span
+                  >
+                </div>
+                <div class="space-y-1">
+                  <div class="option-item" onclick="selectOption(1, 'A')">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">John Smith</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(1, 'B')">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">James Anderson</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(1, 'C')">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">Robert Johnson</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(1, 'D')">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">Michael Brown</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">2</div>
+                  <span class="question-text"
+                    >How much is the Basic Cable Package?</span
+                  >
+                </div>
+                <div class="space-y-1">
+                  <div class="option-item" onclick="selectOption(2, 'A')">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">$35.00</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(2, 'B')">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">$40.00</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(2, 'C')">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">$45.00</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(2, 'D')">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">$50.00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">3</div>
+                  <span class="question-text"
+                    >What is the total amount due?</span
+                  >
+                </div>
+                <div class="space-y-1">
+                  <div class="option-item" onclick="selectOption(3, 'A')">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">$98.91</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(3, 'B')">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">$108.91</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(3, 'C')">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">$118.91</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(3, 'D')">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">$128.91</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">4</div>
+                  <span class="question-text">When is the due date?</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="option-item" onclick="selectOption(4, 'A')">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">March 15, 2024</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(4, 'B')">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">April 1, 2024</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(4, 'C')">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">April 15, 2024</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(4, 'D')">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">May 1, 2024</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">5</div>
+                  <span class="question-text">What is the account number?</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="option-item" onclick="selectOption(5, 'A')">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">CBL-874-5921</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(5, 'B')">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">TV-874-5921-03</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(5, 'C')">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">STR-5921-04</span>
+                  </div>
+                  <div class="option-item" onclick="selectOption(5, 'D')">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">VSN-874-03</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="submit-btn" onclick="checkAnswers()">
+              CHECK ANSWERS
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const correctAnswers = {
+        1: "B",
+        2: "C",
+        3: "C",
+        4: "C",
+        5: "B",
+      };
+
+      let userAnswers = {};
+
+      function selectOption(question, option) {
+        const questionCards = document.querySelectorAll(".question-card");
+        const currentCard = questionCards[question - 1];
+        const options = currentCard.querySelectorAll(".option-item");
+
+        options.forEach((opt) => opt.classList.remove("selected"));
+
+        event.currentTarget.classList.add("selected");
+
+        userAnswers[question] = option;
+
+        new Audio("https://remtoo.net/slider/click.wav").play().catch(() => {});
+      }
+
+      function checkAnswers() {
+        let score = 0;
+        let total = 5;
+
+        for (let q = 1; q <= total; q++) {
+          if (userAnswers[q] === correctAnswers[q]) {
+            score++;
+          }
+        }
+
+        alert(`You got ${score}/${total} correct!`);
+
+        new Audio(
+          score === total
+            ? "https://remtoo.net/slider/success.wav"
+            : "https://remtoo.net/slider/click.wav"
+        )
+          .play()
+          .catch(() => {});
+      }
+
+      window.resetSlide = function () {
+        userAnswers = {};
+        document.querySelectorAll(".option-item").forEach((item) => {
+          item.classList.remove("selected");
+        });
+      };
+    </script>
+  </body>
+</html>

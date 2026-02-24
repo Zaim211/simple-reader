@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Vocabulary - Interactive Slide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        color: white;
+        min-height: 100vh;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .vocab-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        border-radius: 1rem;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .vocab-card:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.5);
+        border-color: #4f46e5;
+        background: rgba(79, 70, 229, 0.25);
+      }
+
+      .vocab-card img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0.5rem;
+      }
+
+      .vocab-title {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #f8f9fc;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      }
+
+      .vocab-definition {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+        display: none;
+        line-height: 1.4;
+      }
+
+      .vocab-card.active .vocab-definition {
+        display: block;
+        margin-top: 0.5rem;
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 1rem;
+        color: #818cf8;
+        background: linear-gradient(135deg, #818cf8, #c084fc);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    </style>
+  </head>
+
+  <body class="h-full overflow-y-auto">
+    <div class="max-w-6xl mx-auto px-6 py-12">
+      <h1>New Banking Vocabulary</h1>
+      <p class="text-center text-white/70">
+        Click a card to see the definition
+      </p>
+
+      <div class="cards-grid" id="vocabGrid">
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/bank-card-back-side.png"
+            alt="Savings Account"
+          />
+          <div class="vocab-title">Savings Account</div>
+          <div class="vocab-definition">
+            A bank account where you keep money safely and earn interest.
+          </div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/bank.png"
+            alt="Current Account"
+          />
+          <div class="vocab-title">Current Account</div>
+          <div class="vocab-definition">
+            A bank account for everyday transactions, usually no interest.
+          </div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/deposit.png"
+            alt="Deposit"
+          />
+          <div class="vocab-title">Deposit</div>
+          <div class="vocab-definition">
+            To put money into your bank account.
+          </div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/withdrawal.png"
+            alt="Withdraw"
+          />
+          <div class="vocab-title">Withdraw</div>
+          <div class="vocab-definition">To take money out of your account.</div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/balance.png"
+            alt="Balance"
+          />
+          <div class="vocab-title">Balance</div>
+          <div class="vocab-definition">
+            The amount of money currently in your bank account.
+          </div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/transaction-list.png"
+            alt="Transactions"
+          />
+          <div class="vocab-title">Transactions</div>
+          <div class="vocab-definition">
+            Records of money going in and out of your account.
+          </div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/atm.png"
+            alt="ATM"
+          />
+          <div class="vocab-title">ATM</div>
+          <div class="vocab-definition">
+            Automated Teller Machine where you can withdraw or deposit money.
+          </div>
+        </div>
+
+        <div class="vocab-card" onclick="toggleDefinition(this)">
+          <img
+            src="https://img.icons8.com/ios-filled/50/ffffff/bank-building.png"
+            alt="Bank Branch"
+          />
+          <div class="vocab-title">Bank Branch</div>
+          <div class="vocab-definition">
+            A physical location of the bank you can visit.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleDefinition(card) {
+        card.classList.toggle("active");
+        gsap.fromTo(card, { scale: 0.95 }, { scale: 1, duration: 0.2 });
+      }
+    </script>
+  </body>
+</html>

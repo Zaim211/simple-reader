@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boston English Center - Lesson 3: Video Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+            },
+          },
+        },
+      };
+
+      (function applyInitialTheme() {
+        let useDark = false;
+        try {
+          if (window.parent && window.parent !== window) {
+            useDark =
+              window.parent.document.documentElement.classList.contains("dark");
+          }
+        } catch (e) {}
+
+        if (!useDark) {
+          const saved = localStorage.getItem("theme-preference");
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          useDark = saved ? saved === "dark" : prefersDark;
+        }
+
+        document.documentElement.classList.toggle("dark", useDark);
+      })();
+
+      window.setTheme = function setTheme(theme) {
+        const useDark = theme === "dark";
+        document.documentElement.classList.toggle("dark", useDark);
+        localStorage.setItem("theme-preference", useDark ? "dark" : "light");
+      };
+    </script>
+    <style>
+      .pointer-events-none.fixed.inset-0.z-0 {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .bg-blur-circle-1 {
+        position: absolute;
+        top: -10rem;
+        left: -10rem;
+        width: 30rem;
+        height: 30rem;
+        border-radius: 50%;
+        background: rgba(79, 70, 229, 0.2);
+        filter: blur(80px);
+      }
+
+      .bg-blur-circle-2 {
+        position: absolute;
+        bottom: -10rem;
+        right: -10rem;
+        width: 35rem;
+        height: 35rem;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.15);
+        filter: blur(80px);
+      }
+
+      .video-container {
+        background: #0f172a;
+        border-radius: 2rem;
+        padding: 1.5rem;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.5);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .video-wrapper {
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+        background: #000;
+      }
+
+      .quiz-container {
+        background: #0f172a;
+        border-radius: 2rem;
+        padding: 1.5rem;
+        border: 2px solid #4f46e5;
+        box-shadow: 0 20px 40px -15px rgba(79, 70, 229, 0.5);
+        height: 100%;
+        overflow-y: auto;
+        max-height: 600px;
+      }
+
+      .question-card {
+        background: #1e293b;
+        border-radius: 1.25rem;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid #334155;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .question-number {
+        background: #4f46e5;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #a5b4fc;
+        box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+      }
+
+      .question-text-small {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .option-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.4rem;
+        border-radius: 0.75rem;
+        background: #0f172a;
+        border: 1px solid #334155;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: white;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .option-item:hover {
+        background: #2d3748;
+        border-color: #4f46e5;
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+      }
+
+      .option-item.selected {
+        background: #4f46e5;
+        border-color: white;
+        border-width: 2px;
+        box-shadow: 0 0 15px rgba(79, 70, 229, 0.7);
+      }
+
+      .option-item.correct {
+        background: #059669;
+        border-color: #10b981;
+        border-width: 2px;
+        box-shadow: 0 0 15px rgba(5, 150, 105, 0.5);
+      }
+
+      .option-item.wrong {
+        background: #b91c1c;
+        border-color: #ef4444;
+        border-width: 2px;
+        box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+      }
+
+      .option-letter {
+        background: #1e293b;
+        color: white;
+        width: 1.8rem;
+        height: 1.8rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        border: 1px solid #4f46e5;
+      }
+
+      .selected .option-letter {
+        background: white;
+        color: #4f46e5;
+        border-color: white;
+      }
+
+      .option-text {
+        flex: 1;
+        color: white;
+        font-size: 0.9rem;
+      }
+
+      .lesson-tag {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: #4f46e5;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+      }
+
+      .teacher-cue-btn {
+        background: #4f46e5;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+      }
+
+      .teacher-cue-btn:hover {
+        background: #4338ca;
+        transform: scale(1.02);
+      }
+
+      .cue-tooltip {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        width: 280px;
+        background: #1e293b;
+        border-radius: 1rem;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+        border: 2px solid #4f46e5;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 50;
+        color: white;
+      }
+
+      .group:hover .cue-tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(20px);
+      }
+
+      .submit-btn {
+        background: #4f46e5;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 2px solid #a5b4fc;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 100%;
+        margin: 0.5rem 0;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.5);
+      }
+
+      .submit-btn:hover {
+        background: #4338ca;
+        transform: scale(1.02);
+        border-color: white;
+      }
+
+      .score-display {
+        background: #4f46e5;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-block;
+        border: 2px solid #a5b4fc;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.5);
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .two-column {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      h1 {
+        text-shadow: 0 2px 10px rgba(79, 70, 229, 0.5);
+      }
+    </style>
+  </head>
+  <body
+    class="h-full overflow-y-auto"
+    style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)"
+  >
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div class="bg-blur-circle-1"></div>
+      <div class="bg-blur-circle-2"></div>
+    </div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-4 py-6 pb-16 min-h-screen">
+      <div class="w-full">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="lesson-tag">LESSON 3 · VIDEO QUIZ</span>
+            <h1 class="text-3xl md:text-4xl font-light text-white mt-1">
+              Interactive<span
+                class="font-black text-indigo-400 block text-4xl md:text-5xl"
+                >Video Quiz</span
+              >
+            </h1>
+          </div>
+
+          <div class="group relative">
+            <button class="teacher-cue-btn">
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Teacher Cue
+            </button>
+            <div class="cue-tooltip text-left">
+              <p class="text-indigo-400 font-bold mb-2">📋 QUIZ INSTRUCTION</p>
+              <p class="text-sm">Watch the video and answer the questions</p>
+              <p class="text-xs text-white/80 mt-2">
+                Click "Check Answers" to see results
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <div class="video-container">
+            <h2
+              class="text-xl font-bold text-white mb-3 flex items-center gap-2"
+            >
+              <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+              Watch the Video
+            </h2>
+            <div class="video-wrapper">
+              <video
+                id="quizVideo"
+                class="w-full aspect-video"
+                controls
+                poster="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&auto=format&fit=crop"
+              >
+                <source
+                  src="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4"
+                  type="video/mp4"
+                />
+              </video>
+            </div>
+            <p class="text-white/40 text-sm mt-3 text-center">
+              👆 Watch the conversation then answer the questions
+            </p>
+          </div>
+
+          <div class="quiz-container">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+                Answer Questions
+              </h2>
+              <div id="scoreDisplay" class="score-display hidden">0/5</div>
+            </div>
+
+            <div class="space-y-3">
+              <div class="question-card" id="q1">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">1</div>
+                  <span class="question-text-small"
+                    >Why does the customer go to the bank?</span
+                  >
+                </div>
+                <div class="space-y-1">
+                  <div
+                    class="option-item"
+                    onclick="selectOption(1, 'A')"
+                    id="q1A"
+                  >
+                    <span class="option-letter">A</span>
+                    <span class="option-text">To open a new account</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(1, 'B')"
+                    id="q1B"
+                  >
+                    <span class="option-letter">B</span>
+                    <span class="option-text">To pay the electric bill</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(1, 'C')"
+                    id="q1C"
+                  >
+                    <span class="option-letter">C</span>
+                    <span class="option-text">To buy a new card</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(1, 'D')"
+                    id="q1D"
+                  >
+                    <span class="option-letter">D</span>
+                    <span class="option-text">To send a letter</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card" id="q2">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">2</div>
+                  <span class="question-text-small"
+                    >What does the teller ask to show?</span
+                  >
+                </div>
+                <div class="space-y-1">
+                  <div
+                    class="option-item"
+                    onclick="selectOption(2, 'A')"
+                    id="q2A"
+                  >
+                    <span class="option-letter">A</span>
+                    <span class="option-text">A passport</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(2, 'B')"
+                    id="q2B"
+                  >
+                    <span class="option-letter">B</span>
+                    <span class="option-text">The bill</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(2, 'C')"
+                    id="q2C"
+                  >
+                    <span class="option-letter">C</span>
+                    <span class="option-text">A photo</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(2, 'D')"
+                    id="q2D"
+                  >
+                    <span class="option-letter">D</span>
+                    <span class="option-text">A phone</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card" id="q3">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">3</div>
+                  <span class="question-text-small">How much is the bill?</span>
+                </div>
+                <div class="space-y-1">
+                  <div
+                    class="option-item"
+                    onclick="selectOption(3, 'A')"
+                    id="q3A"
+                  >
+                    <span class="option-letter">A</span>
+                    <span class="option-text">45.60 dollars</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(3, 'B')"
+                    id="q3B"
+                  >
+                    <span class="option-letter">B</span>
+                    <span class="option-text">15 dollars</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(3, 'C')"
+                    id="q3C"
+                  >
+                    <span class="option-letter">C</span>
+                    <span class="option-text">100 dollars</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(3, 'D')"
+                    id="q3D"
+                  >
+                    <span class="option-letter">D</span>
+                    <span class="option-text">5.60 dollars</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card" id="q4">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">4</div>
+                  <span class="question-text-small"
+                    >How does the customer pay?</span
+                  >
+                </div>
+                <div class="space-y-1">
+                  <div
+                    class="option-item"
+                    onclick="selectOption(4, 'A')"
+                    id="q4A"
+                  >
+                    <span class="option-letter">A</span>
+                    <span class="option-text">By cash</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(4, 'B')"
+                    id="q4B"
+                  >
+                    <span class="option-letter">B</span>
+                    <span class="option-text">By check</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(4, 'C')"
+                    id="q4C"
+                  >
+                    <span class="option-letter">C</span>
+                    <span class="option-text">By card</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(4, 'D')"
+                    id="q4D"
+                  >
+                    <span class="option-letter">D</span>
+                    <span class="option-text">Online</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-card" id="q5">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="question-number">5</div>
+                  <span class="question-text-small"
+                    >What does the teller give at the end?</span
+                  >
+                </div>
+                <div class="grid grid-cols-2 gap-1">
+                  <div
+                    class="option-item"
+                    onclick="selectOption(5, 'A')"
+                    id="q5A"
+                  >
+                    <span class="option-letter">A</span>
+                    <span class="option-text">New account</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(5, 'B')"
+                    id="q5B"
+                  >
+                    <span class="option-letter">B</span>
+                    <span class="option-text">A receipt</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(5, 'C')"
+                    id="q5C"
+                  >
+                    <span class="option-letter">C</span>
+                    <span class="option-text">A bill</span>
+                  </div>
+                  <div
+                    class="option-item"
+                    onclick="selectOption(5, 'D')"
+                    id="q5D"
+                  >
+                    <span class="option-letter">D</span>
+                    <span class="option-text">Credit card</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <button class="submit-btn" onclick="checkAnswers()">
+                CHECK ANSWERS
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const correctAnswers = {
+        1: "B",
+        2: "B",
+        3: "A",
+        4: "C",
+        5: "B",
+      };
+
+      let userAnswers = {};
+
+      function selectOption(question, option) {
+        for (let i = 1; i <= 4; i++) {
+          const letter = String.fromCharCode(64 + i);
+          const elem = document.getElementById(`q${question}${letter}`);
+          if (elem) elem.classList.remove("selected");
+        }
+
+        const selectedElem = document.getElementById(`q${question}${option}`);
+        if (selectedElem) selectedElem.classList.add("selected");
+
+        userAnswers[question] = option;
+
+        new Audio("https://remtoo.net/slider/click.wav").play().catch(() => {});
+      }
+
+      function checkAnswers() {
+        let score = 0;
+
+        for (let q = 1; q <= 5; q++) {
+          for (let i = 1; i <= 4; i++) {
+            const letter = String.fromCharCode(64 + i);
+            const elem = document.getElementById(`q${q}${letter}`);
+            if (elem) elem.classList.remove("correct", "wrong");
+          }
+
+          if (userAnswers[q]) {
+            const userOption = userAnswers[q];
+            const userElem = document.getElementById(`q${q}${userOption}`);
+
+            if (userOption === correctAnswers[q]) {
+              userElem.classList.add("correct");
+              score++;
+            } else {
+              userElem.classList.add("wrong");
+              const correctElem = document.getElementById(
+                `q${q}${correctAnswers[q]}`
+              );
+              if (correctElem) correctElem.classList.add("correct");
+            }
+          } else {
+            const correctElem = document.getElementById(
+              `q${q}${correctAnswers[q]}`
+            );
+            if (correctElem) correctElem.classList.add("correct");
+          }
+        }
+
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        scoreDisplay.classList.remove("hidden");
+        scoreDisplay.textContent = `${score}/5`;
+
+        new Audio(
+          score === 5
+            ? "https://remtoo.net/slider/success.wav"
+            : "https://remtoo.net/slider/click.wav"
+        )
+          .play()
+          .catch(() => {});
+      }
+
+      window.resetSlide = function () {
+        userAnswers = {};
+        for (let q = 1; q <= 5; q++) {
+          for (let i = 1; i <= 4; i++) {
+            const letter = String.fromCharCode(64 + i);
+            const elem = document.getElementById(`q${q}${letter}`);
+            if (elem) elem.classList.remove("selected", "correct", "wrong");
+          }
+        }
+        document.getElementById("scoreDisplay").classList.add("hidden");
+        document.getElementById("quizVideo")?.pause();
+      };
+
+      window.stopSlideAudio = function () {
+        document.getElementById("quizVideo")?.pause();
+      };
+    </script>
+  </body>
+</html>
